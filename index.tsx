@@ -9,6 +9,7 @@ interface State {
   showSuggestions: boolean;
 }
 
+// Başlangıçta herhangi bir kahraman seçili olmasın (Ana sayfa listesi gelsin)
 let state: State = {
   searchTerm: '',
   selectedHero: null,
@@ -43,7 +44,7 @@ function HeroCardDetail(hero: string, isAoV: boolean, iconUrl?: string) {
   const displayImage = iconUrl || fallbackUrl;
   
   return `
-    <div class="relative w-full max-w-[480px] mx-auto transition-all duration-1000">
+    <div class="relative w-full max-w-[480px] mx-auto transition-all duration-1000 animate-in">
       <div class="relative aspect-square flex items-center justify-center">
         <!-- Minimalist Background Glow -->
         <div class="absolute inset-0 opacity-20 bg-gradient-to-tr ${isAoV ? 'from-sky-500' : 'from-rose-500'} to-transparent blur-[120px] rounded-full"></div>
@@ -76,10 +77,25 @@ function render() {
 function renderListView(container: HTMLElement) {
   const search = state.searchTerm.toLowerCase();
   
+  // Kullanıcı isteğine göre sıralama: Veera, Krixi, Ilumia, Mganga en başta
+  const forcedMages = ['Veera', 'Krixi', 'Ilumia', 'Mganga'];
+
   const sortedMappings = [...HERO_MAPPINGS].sort((a, b) => {
+    // Rol önceliği (Büyücüler 0, diğerleri 1)
     const prioA = getRolePriority(a.role);
     const prioB = getRolePriority(b.role);
     if (prioA !== prioB) return prioA - prioB;
+
+    // Aynı rol grubu içindeki sıralama
+    const idxA = forcedMages.indexOf(a.aovName);
+    const idxB = forcedMages.indexOf(b.aovName);
+    
+    if (idxA !== -1 || idxB !== -1) {
+      const valA = idxA === -1 ? 999 : idxA;
+      const valB = idxB === -1 ? 999 : idxB;
+      if (valA !== valB) return valA - valB;
+    }
+
     return a.aovName.localeCompare(b.aovName);
   });
 
@@ -111,7 +127,7 @@ function renderListView(container: HTMLElement) {
           <h1 class="heading-font text-5xl md:text-8xl font-black tracking-tighter mb-4 text-white uppercase italic leading-none">
             ZY <span class="text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-700">MOBA</span>
           </h1>
-          <p class="text-slate-500 font-bold uppercase tracking-[0.3em] text-sm opacity-40">Büyücüler Öncelikli Karşılaştırma</p>
+          <p class="text-slate-500 font-bold uppercase tracking-[0.3em] text-sm opacity-40">Karakter Karşılaştırma Rehberi</p>
         </header>
 
         <div class="max-w-5xl mx-auto mb-16 space-y-12">
@@ -160,8 +176,8 @@ function renderListView(container: HTMLElement) {
                       class="w-full h-full rounded-[2.5rem] object-cover border border-white/10 shadow-[0_15px_40px_rgba(0,0,0,0.5)] transition-all duration-700 group-hover:scale-110" 
                     />
                 </div>
-                <div class="mt-4">
-                  <div class="text-2xl xl:text-3xl font-black text-white leading-tight uppercase italic tracking-tighter group-hover:text-sky-400 transition-colors truncate w-full px-2">${hero.aovName}</div>
+                <div class="mt-4 w-full">
+                  <div class="text-2xl xl:text-3xl font-black text-white leading-tight uppercase italic tracking-tighter group-hover:text-sky-400 transition-colors truncate px-2">${hero.aovName}</div>
                   <div class="text-[10px] text-slate-600 uppercase tracking-[0.2em] font-bold mt-3">
                     KARŞILIĞI: <span class="text-rose-500">${hero.hokName}</span>
                   </div>
@@ -180,7 +196,6 @@ function renderListView(container: HTMLElement) {
 
   const searchInput = document.getElementById('search-input') as HTMLInputElement;
   if (searchInput) {
-    if (state.searchTerm.length > 0) searchInput.focus();
     searchInput.addEventListener('input', (e) => {
       const val = (e.target as HTMLInputElement).value;
       setState({ searchTerm: val, showSuggestions: val.length > 0 });
@@ -191,7 +206,8 @@ function renderListView(container: HTMLElement) {
 
   document.querySelectorAll('.suggestion-item, .hero-select-btn').forEach(el => {
     el.addEventListener('click', (e) => {
-      const hero = HERO_MAPPINGS.find(h => h.aovName === (e.currentTarget as HTMLElement).dataset.hero);
+      const heroName = (e.currentTarget as HTMLElement).dataset.hero;
+      const hero = HERO_MAPPINGS.find(h => h.aovName === heroName);
       if (hero) setState({ selectedHero: hero, showSuggestions: false });
     });
   });
@@ -209,7 +225,7 @@ function renderDetailView(container: HTMLElement, hero: HeroMatch) {
       <div class="relative z-10 w-full max-w-[1300px]">
         <div class="flex flex-col lg:flex-row items-center justify-between gap-12">
           
-          <div class="w-full lg:flex-1 animate-in slide-in-from-left duration-700">
+          <div class="w-full lg:flex-1 animate-in">
             ${HeroCardDetail(hero.aovName, true, hero.aovIconUrl)}
           </div>
           
@@ -244,7 +260,7 @@ function renderDetailView(container: HTMLElement, hero: HeroMatch) {
              </button>
           </div>
 
-          <div class="w-full lg:flex-1 animate-in slide-in-from-right duration-700">
+          <div class="w-full lg:flex-1 animate-in">
             ${HeroCardDetail(hero.hokName, false, hero.hokIconUrl)}
           </div>
 
