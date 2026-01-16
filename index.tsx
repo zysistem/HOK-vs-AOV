@@ -102,7 +102,7 @@ function renderListView(container: HTMLElement) {
          <div class="absolute bottom-[-20%] right-[-20%] w-[80%] h-[80%] bg-rose-600 rounded-full blur-[250px]"></div>
       </div>
 
-      <div class="relative z-10 max-w-[1800px] mx-auto py-12 lg:py-16">
+      <div class="relative z-10 max-w-[1920px] mx-auto py-12 lg:py-16">
         <header class="text-center mb-16 lg:mb-20">
           <div class="inline-flex items-center gap-4 px-8 py-3 rounded-full glass mb-8">
              <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
@@ -147,22 +147,22 @@ function renderListView(container: HTMLElement) {
 
         <div class="hero-grid">
           ${filtered.map(hero => `
-            <button class="hero-select-btn group relative glass p-8 rounded-[3.5rem] transition-all hover:-translate-y-4 hover:bg-white/5 text-center h-[460px]" data-hero="${hero.aovName}">
-              <div class="absolute top-8 right-8 px-4 py-1.5 rounded-full text-[9px] font-black uppercase border ${getRoleColor(hero.role)}">
+            <button class="hero-select-btn group relative glass p-6 rounded-[3rem] transition-all hover:-translate-y-4 hover:bg-white/5 text-center h-[420px]" data-hero="${hero.aovName}">
+              <div class="absolute top-6 right-6 px-3 py-1 rounded-full text-[8px] font-black uppercase border ${getRoleColor(hero.role)}">
                  ${hero.role}
               </div>
               <div class="flex flex-col h-full justify-between items-center py-4">
-                <div class="relative w-44 h-44">
+                <div class="relative w-36 h-36 xl:w-40 xl:h-40">
                     <img 
                       src="${hero.aovIconUrl}" 
                       referrerpolicy="no-referrer" 
                       onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${hero.aovName}'" 
-                      class="w-full h-full rounded-[3rem] object-cover border border-white/10 shadow-[0_15px_40px_rgba(0,0,0,0.5)] transition-all duration-700 group-hover:scale-110" 
+                      class="w-full h-full rounded-[2.5rem] object-cover border border-white/10 shadow-[0_15px_40px_rgba(0,0,0,0.5)] transition-all duration-700 group-hover:scale-110" 
                     />
                 </div>
                 <div class="mt-4">
-                  <div class="text-3xl font-black text-white leading-tight uppercase italic tracking-tighter group-hover:text-sky-400 transition-colors truncate w-full px-2">${hero.aovName}</div>
-                  <div class="text-[11px] text-slate-600 uppercase tracking-[0.2em] font-bold mt-3">
+                  <div class="text-2xl xl:text-3xl font-black text-white leading-tight uppercase italic tracking-tighter group-hover:text-sky-400 transition-colors truncate w-full px-2">${hero.aovName}</div>
+                  <div class="text-[10px] text-slate-600 uppercase tracking-[0.2em] font-bold mt-3">
                     KARŞILIĞI: <span class="text-rose-500">${hero.hokName}</span>
                   </div>
                 </div>
