@@ -38,10 +38,10 @@ function HeroCardHTML(hero: string, isAoV: boolean, role: HeroRole, iconUrl?: st
   const gradient = getRoleBadgeColor(role);
 
   return `
-    <div class="relative group w-full overflow-hidden rounded-[3.5rem] border-2 ${isAoV ? 'border-sky-500/40 shadow-[0_0_100px_rgba(14,165,233,0.15)]' : 'border-rose-500/40 shadow-[0_0_100px_rgba(239,68,68,0.15)]'} bg-[#020617] transition-all duration-700 h-full">
+    <div class="relative group w-full overflow-hidden rounded-[3.5rem] border-2 ${isAoV ? 'border-sky-500/40' : 'border-rose-500/40'} bg-[#020617] h-full shadow-2xl">
       <div class="relative aspect-[4/5] overflow-hidden bg-slate-950">
         <div class="absolute inset-0 opacity-20 bg-gradient-to-tr ${gradient} blur-[120px]"></div>
-        <div class="absolute inset-0 flex items-center justify-center p-12 z-10">
+        <div class="absolute inset-0 flex items-center justify-center p-10 z-10">
           <img 
             src="${displayImage}" 
             alt="${hero}" 
@@ -51,18 +51,18 @@ function HeroCardHTML(hero: string, isAoV: boolean, role: HeroRole, iconUrl?: st
           />
         </div>
         <div class="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent opacity-95 z-20"></div>
-        <div class="absolute top-10 left-10 z-30">
-            <div class="px-6 py-2 text-[9px] font-black uppercase tracking-[0.4em] rounded-full shadow-xl backdrop-blur-3xl border border-white/10 ${isAoV ? 'bg-sky-500/80' : 'bg-rose-500/80'} text-white">
+        <div class="absolute top-8 left-8 z-30">
+            <div class="px-5 py-2 text-[8px] font-black uppercase tracking-[0.3em] rounded-full shadow-xl backdrop-blur-3xl border border-white/10 ${isAoV ? 'bg-sky-500/80' : 'bg-rose-500/80'} text-white">
                 ${isAoV ? 'AoV ARENA' : 'HoK WORLD'}
             </div>
         </div>
       </div>
-      <div class="absolute bottom-0 left-0 right-0 p-12 z-30">
+      <div class="absolute bottom-0 left-0 right-0 p-10 z-30">
         <div class="flex flex-col items-start">
-          <div class="h-1.5 w-16 mb-6 rounded-full bg-gradient-to-r ${gradient}"></div>
-          <h3 class="heading-font text-4xl font-black text-white leading-none tracking-tighter uppercase italic">${hero}</h3>
-          <div class="mt-6">
-            <span class="px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-gradient-to-r ${gradient} text-white">
+          <div class="h-1 w-12 mb-4 rounded-full bg-gradient-to-r ${gradient}"></div>
+          <h3 class="heading-font text-3xl font-black text-white leading-tight tracking-tighter uppercase italic">${hero}</h3>
+          <div class="mt-4">
+            <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-gradient-to-r ${gradient} text-white">
                 ${role}
             </span>
           </div>
@@ -96,54 +96,51 @@ function renderListView(container: HTMLElement) {
         <div class="absolute bottom-0 right-1/4 w-[1200px] h-[1200px] bg-rose-600/5 rounded-full blur-[250px]"></div>
       </div>
 
-      <div class="relative z-10 max-w-[1600px] mx-auto px-6 py-12 lg:py-24">
-        <header class="text-center mb-20">
+      <div class="relative z-10 max-w-[1600px] mx-auto px-6 py-12 lg:py-20">
+        <header class="text-center mb-16">
           <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-slate-900/60 border border-slate-800 mb-8 backdrop-blur-md">
-            <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
-            </span>
-            <span class="text-[10px] font-black tracking-[0.4em] text-slate-400 uppercase">ZY MOBA - Cross Reference</span>
+             <span class="text-[10px] font-black tracking-[0.4em] text-slate-400 uppercase">ZY MOBA CROSS-REF</span>
           </div>
-          <h1 class="heading-font text-5xl md:text-8xl font-black tracking-tighter mb-8 text-white uppercase italic">
+          <h1 class="heading-font text-5xl md:text-8xl font-black tracking-tighter mb-4 text-white uppercase italic">
             ZY <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-white to-rose-400">MOBA</span>
           </h1>
+          <p class="text-slate-500 font-bold uppercase tracking-[0.2em] text-sm opacity-60">124 Kahraman Karşılaştırması</p>
         </header>
 
-        <div class="max-w-5xl mx-auto mb-24 space-y-10">
-          <div class="flex flex-wrap justify-center gap-3">
-            <button class="role-btn px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-white/5 transition-all ${state.selectedRole === 'ALL' ? 'bg-white text-black' : 'bg-slate-900/40 text-slate-500'}" data-role="ALL">HEPSİ</button>
+        <div class="max-w-5xl mx-auto mb-16 space-y-8">
+          <div class="flex flex-wrap justify-center gap-2">
+            <button class="role-btn px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border border-white/5 transition-all ${state.selectedRole === 'ALL' ? 'bg-white text-black' : 'bg-slate-900/40 text-slate-500'}" data-role="ALL">HEPSİ</button>
             ${roles.map(role => `
-              <button class="role-btn px-7 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-white/5 transition-all ${state.selectedRole === role ? 'bg-sky-600 text-white' : 'bg-slate-900/40 text-slate-500'}" data-role="${role}">${role}</button>
+              <button class="role-btn px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border border-white/5 transition-all ${state.selectedRole === role ? 'bg-sky-600 text-white' : 'bg-slate-900/40 text-slate-500'}" data-role="${role}">${role}</button>
             `).join('')}
           </div>
 
           <div class="relative group max-w-2xl mx-auto">
             <div class="absolute -inset-1 bg-white/5 rounded-[2rem] blur group-focus-within:bg-sky-500/20 transition duration-500"></div>
-            <div class="relative flex items-center bg-slate-950 border border-slate-800/80 rounded-[1.8rem] p-5 backdrop-blur-3xl">
+            <div class="relative flex items-center bg-slate-950 border border-slate-800/80 rounded-[1.5rem] p-4 backdrop-blur-3xl shadow-2xl">
               <i class="fas fa-search text-slate-700 ml-4"></i>
-              <input id="search-input" type="text" placeholder="Kahraman adı ara..." value="${state.searchTerm}" class="flex-1 bg-transparent border-none outline-none px-6 text-xl text-white placeholder:text-slate-800" />
+              <input id="search-input" type="text" placeholder="Kahraman adı (AoV veya HoK)..." value="${state.searchTerm}" class="flex-1 bg-transparent border-none outline-none px-6 text-lg text-white placeholder:text-slate-800" />
             </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
+        <div class="hero-grid">
           ${filtered.map(hero => `
-            <button class="hero-select-btn group relative bg-slate-900/20 border border-slate-800 hover:border-sky-500/30 p-6 rounded-[2.5rem] transition-all hover:-translate-y-1.5 text-left overflow-hidden" data-hero="${hero.aovName}">
-              <div class="absolute top-0 right-0 px-3 py-1 text-[8px] font-black uppercase bg-gradient-to-br ${getRoleBadgeColor(hero.role)} text-white rounded-bl-xl z-20">
+            <button class="hero-select-btn group relative bg-slate-900/20 border border-slate-800/50 hover:border-sky-500/30 p-5 rounded-[2rem] transition-all hover:-translate-y-1 text-center" data-hero="${hero.aovName}">
+              <div class="absolute top-0 right-0 px-3 py-1 text-[7px] font-black uppercase bg-gradient-to-br ${getRoleBadgeColor(hero.role)} text-white rounded-bl-xl z-20">
                  ${hero.role}
               </div>
-              <div class="mt-2 flex flex-col items-center text-center gap-3 relative z-10">
-                <img 
-                  src="${hero.aovIconUrl}" 
-                  referrerpolicy="no-referrer"
-                  onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${hero.aovName}'" 
-                  class="w-20 h-20 rounded-2xl border border-white/10 object-cover shadow-lg group-hover:scale-110 transition-transform duration-500" 
-                />
+              <div class="flex flex-col items-center gap-3">
+                <div class="relative">
+                    <img src="${hero.aovIconUrl}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${hero.aovName}'" class="w-16 h-16 rounded-xl border border-white/5 object-cover group-hover:scale-110 transition-transform" />
+                    <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-rose-500 border-2 border-slate-950 flex items-center justify-center">
+                        <i class="fas fa-sync-alt text-[8px] text-white"></i>
+                    </div>
+                </div>
                 <div>
-                  <div class="text-xl font-black text-white group-hover:text-sky-400 truncate">${hero.aovName}</div>
-                  <div class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mt-1">
-                    HoK: <span class="text-rose-400/80">${hero.hokName}</span>
+                  <div class="text-sm font-black text-white group-hover:text-sky-400 truncate">${hero.aovName}</div>
+                  <div class="text-[8px] text-slate-500 uppercase tracking-widest font-bold mt-1">
+                    HoK: <span class="text-rose-400">${hero.hokName}</span>
                   </div>
                 </div>
               </div>
@@ -154,7 +151,6 @@ function renderListView(container: HTMLElement) {
     </div>
   `;
 
-  // Attach Listeners
   document.querySelectorAll('.role-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       setState({ selectedRole: (e.currentTarget as HTMLElement).dataset.role as any });
@@ -184,54 +180,55 @@ function renderDetailView(container: HTMLElement, hero: HeroMatch) {
         <div class="absolute bottom-0 right-1/4 w-[1200px] h-[1200px] bg-rose-600/5 rounded-full blur-[250px]"></div>
       </div>
 
-      <div class="relative z-10 max-w-[1600px] mx-auto px-6 py-24">
-        <div class="flex flex-col lg:flex-row items-center justify-center gap-16 lg:gap-24">
-          <div class="w-full lg:flex-1 max-w-md space-y-8">
-            <div class="bg-slate-900/60 border border-sky-500/30 p-8 rounded-[2.5rem] backdrop-blur-3xl text-center shadow-2xl">
-               <div class="text-[10px] font-black text-sky-500 uppercase tracking-widest mb-2">ARENA OF VALOR</div>
-               <h4 class="heading-font text-5xl font-black text-white uppercase italic tracking-tighter">${hero.aovName}</h4>
+      <div class="relative z-10 max-w-[1400px] mx-auto px-6 py-20">
+        <div class="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20">
+          
+          <div class="w-full lg:flex-1 max-w-sm space-y-6">
+            <div class="bg-slate-900/60 border border-sky-500/30 p-6 rounded-[2rem] backdrop-blur-3xl text-center shadow-2xl">
+               <div class="text-[9px] font-black text-sky-500 uppercase tracking-widest mb-1">ARENA OF VALOR</div>
+               <h4 class="heading-font text-4xl font-black text-white uppercase italic tracking-tighter">${hero.aovName}</h4>
             </div>
             ${HeroCardHTML(hero.aovName, true, hero.role, hero.aovIconUrl)}
           </div>
           
-          <div class="flex flex-col items-center gap-12">
+          <div class="flex flex-col items-center gap-8">
              <div class="relative">
-                <div class="w-28 h-28 rounded-full bg-slate-950 border-4 border-slate-800 flex items-center justify-center relative z-10 shadow-2xl">
-                   <span class="heading-font text-3xl font-black text-white italic">VS</span>
+                <div class="w-24 h-24 rounded-full bg-slate-950 border-4 border-slate-800 flex items-center justify-center relative z-10 shadow-2xl">
+                   <span class="heading-font text-2xl font-black text-white italic">VS</span>
                 </div>
                 <div class="absolute inset-0 bg-sky-500/20 rounded-full blur-2xl animate-pulse"></div>
              </div>
 
-             <div class="flex flex-col gap-6">
-                <div class="bg-slate-900/80 border border-white/5 p-8 rounded-[2.5rem] text-center min-w-[320px] backdrop-blur-2xl shadow-xl">
-                   <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">BENZERLİK SKORU</div>
-                   <div class="text-6xl font-black text-sky-400 italic">%${hero.matchSimilarity}</div>
+             <div class="flex flex-col gap-4">
+                <div class="bg-slate-900/80 border border-white/5 p-6 rounded-[2rem] text-center min-w-[280px] backdrop-blur-2xl shadow-xl">
+                   <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">BENZERLİK</div>
+                   <div class="text-5xl font-black text-sky-400 italic">%${hero.matchSimilarity}</div>
                 </div>
                 
-                <div class="bg-slate-900/80 border border-white/5 p-8 rounded-[2.5rem] text-center backdrop-blur-2xl space-y-6 shadow-xl">
+                <div class="bg-slate-900/80 border border-white/5 p-6 rounded-[2rem] text-center backdrop-blur-2xl space-y-4 shadow-xl">
                   <div>
-                    <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">ANA KORİDOR</div>
-                    <div class="text-2xl font-black text-white uppercase tracking-tighter">${hero.lane}</div>
+                    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">KORİDOR</div>
+                    <div class="text-xl font-black text-white uppercase tracking-tighter">${hero.lane}</div>
                   </div>
                   <div class="h-px bg-white/5 w-1/2 mx-auto"></div>
                   <div>
-                    <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">HERO SINIFI</div>
-                    <div class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r ${getRoleBadgeColor(hero.role)} uppercase tracking-tighter">
+                    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">ROL</div>
+                    <div class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r ${getRoleBadgeColor(hero.role)} uppercase tracking-tighter">
                       ${hero.role}
                     </div>
                   </div>
                 </div>
              </div>
 
-             <button id="back-btn" class="px-14 py-6 bg-white text-black rounded-3xl text-[11px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl">
-                <i class="fas fa-arrow-left mr-4"></i> LİSTEYE DÖN
+             <button id="back-btn" class="px-10 py-5 bg-white text-black rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl">
+                <i class="fas fa-arrow-left mr-3"></i> LİSTEYE DÖN
              </button>
           </div>
 
-          <div class="w-full lg:flex-1 max-w-md space-y-8">
-            <div class="bg-slate-900/60 border border-rose-500/30 p-8 rounded-[2.5rem] backdrop-blur-3xl text-center shadow-2xl">
-               <div class="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2">HONOR OF KINGS</div>
-               <h4 class="heading-font text-5xl font-black text-white uppercase italic tracking-tighter">${hero.hokName}</h4>
+          <div class="w-full lg:flex-1 max-w-sm space-y-6">
+            <div class="bg-slate-900/60 border border-rose-500/30 p-6 rounded-[2rem] backdrop-blur-3xl text-center shadow-2xl">
+               <div class="text-[9px] font-black text-rose-500 uppercase tracking-widest mb-1">HONOR OF KINGS</div>
+               <h4 class="heading-font text-4xl font-black text-white uppercase italic tracking-tighter">${hero.hokName}</h4>
             </div>
             ${HeroCardHTML(hero.hokName, false, hero.role, hero.hokIconUrl)}
           </div>

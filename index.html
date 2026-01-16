@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZY MOBA - AoV & HoK Cross-Ref</title>
+    <!-- Favicon hatasını gidermek için ikon -->
     <link rel="icon" type="image/png" href="https://img.icons8.com/color/48/sword.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -21,6 +22,11 @@
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #020617; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1.25rem;
+        }
     </style>
 <script type="importmap">
 {
@@ -32,7 +38,7 @@
 </head>
 <body>
     <div id="root"></div>
-    <!-- KRİTİK: Giriş noktası burasıdır -->
+    <!-- Script modülü yüklendi -->
     <script type="module" src="/index.tsx"></script>
 </body>
 </html>
