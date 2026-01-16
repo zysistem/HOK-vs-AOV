@@ -14,19 +14,16 @@ let state: State = {
   selectedRole: 'ALL',
 };
 
-// Uygulamanın ana iskeletinin kurulup kurulmadığını takip eder
 let isLayoutRendered = false;
 
 function setState(newState: Partial<State>) {
   const oldSelectedHero = state.selectedHero;
   state = { ...state, ...newState };
   
-  // Eğer görünüm (Liste -> Detay veya tam tersi) değiştiyse tam render yap
   if (oldSelectedHero !== state.selectedHero) {
     isLayoutRendered = false;
     render();
   } else {
-    // Sadece arama veya rol değiştiyse kısmi güncelleme yap
     updateDynamicContent();
   }
 }
@@ -106,7 +103,6 @@ function updateDynamicContent() {
 
   const filtered = getFilteredHeroes();
   
-  // Grid içeriğini güncelle
   grid.innerHTML = filtered.map((h, i) => `
     <button class="hero-card hero-card-hover glass p-6 rounded-[3rem] h-[400px] flex flex-col items-center justify-between group animate-reveal" style="animation-delay: ${i * 0.02}s" data-aov="${h.aovName}">
       <div class="w-full flex justify-between items-center">
@@ -129,7 +125,6 @@ function updateDynamicContent() {
     </button>
   `).join('');
 
-  // Click eventlerini tekrar bağla (Çünkü grid içeriği değişti)
   grid.querySelectorAll('.hero-card').forEach(card => {
     card.addEventListener('click', () => {
       const hero = HERO_MAPPINGS.find(m => m.aovName === (card as HTMLElement).dataset.aov);
@@ -137,7 +132,6 @@ function updateDynamicContent() {
     });
   });
 
-  // Role tablarını güncelle (Aktif sınıfı için)
   document.querySelectorAll('.role-tab').forEach(btn => {
     const r = (btn as HTMLElement).dataset.role;
     if (r === state.selectedRole) {
@@ -202,12 +196,10 @@ function renderListLayout(container: HTMLElement) {
       </div>
 
       <div id="hero-grid-dynamic" class="hero-grid max-w-[1920px] mx-auto">
-        <!-- İçerik updateDynamicContent tarafından doldurulacak -->
       </div>
     </div>
   `;
 
-  // Global Eventler (Sadece Layout kurulduğunda bir kez bağlanır)
   const searchInput = document.getElementById('main-search') as HTMLInputElement;
   searchInput?.addEventListener('input', (e) => {
     state.searchTerm = (e.target as HTMLInputElement).value;
