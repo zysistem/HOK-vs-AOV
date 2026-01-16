@@ -14,9 +14,21 @@ let state: State = {
   selectedRole: 'ALL',
 };
 
+// Uygulamanın ana iskeletinin kurulup kurulmadığını takip eder
+let isLayoutRendered = false;
+
 function setState(newState: Partial<State>) {
+  const oldSelectedHero = state.selectedHero;
   state = { ...state, ...newState };
-  render();
+  
+  // Eğer görünüm (Liste -> Detay veya tam tersi) değiştiyse tam render yap
+  if (oldSelectedHero !== state.selectedHero) {
+    isLayoutRendered = false;
+    render();
+  } else {
+    // Sadece arama veya rol değiştiyse kısmi güncelleme yap
+    updateDynamicContent();
+  }
 }
 
 const getRoleBadge = (role: HeroRole) => {
@@ -64,25 +76,12 @@ function HeroDetailDisplay(hero: string, isAoV: boolean, iconUrl?: string) {
   `;
 }
 
-function render() {
-  const root = document.getElementById('root');
-  if (!root) return;
-  if (state.selectedHero) {
-    renderDetail(root, state.selectedHero);
-  } else {
-    renderList(root);
-  }
-}
-
-function renderList(container: HTMLElement) {
+function getFilteredHeroes() {
   const forcedMages = ['Veera', 'Krixi', 'Ilumia', 'Mganga'];
   const sorted = [...HERO_MAPPINGS].sort((a, b) => {
-    // Priority 1: Mages first
     const aPrio = a.role === HeroRole.MAGE ? 0 : 1;
     const bPrio = b.role === HeroRole.MAGE ? 0 : 1;
     if (aPrio !== bPrio) return aPrio - bPrio;
-
-    // Priority 2: Forced mages sequence
     const aIdx = forcedMages.indexOf(a.aovName);
     const bIdx = forcedMages.indexOf(b.aovName);
     if (aIdx !== -1 || bIdx !== -1) {
@@ -90,18 +89,87 @@ function renderList(container: HTMLElement) {
       const vB = bIdx === -1 ? 999 : bIdx;
       if (vA !== vB) return vA - vB;
     }
-
-    // Priority 3: Alphabetical
     return a.aovName.localeCompare(b.aovName);
   });
 
-  const filtered = sorted.filter(h => {
+  return sorted.filter(h => {
     const term = state.searchTerm.toLowerCase();
     const matchSearch = h.aovName.toLowerCase().includes(term) || h.hokName.toLowerCase().includes(term);
     const matchRole = state.selectedRole === 'ALL' || h.role === state.selectedRole;
     return matchSearch && matchRole;
   });
+}
 
+function updateDynamicContent() {
+  const grid = document.getElementById('hero-grid-dynamic');
+  if (!grid) return;
+
+  const filtered = getFilteredHeroes();
+  
+  // Grid içeriğini güncelle
+  grid.innerHTML = filtered.map((h, i) => `
+    <button class="hero-card hero-card-hover glass p-6 rounded-[3rem] h-[400px] flex flex-col items-center justify-between group animate-reveal" style="animation-delay: ${i * 0.02}s" data-aov="${h.aovName}">
+      <div class="w-full flex justify-between items-center">
+        ${getRoleBadge(h.role)}
+        <div class="w-8 h-8 rounded-full flex items-center justify-center border border-white/10 group-hover:bg-cyan-500/20 transition-colors">
+          <i class="fas fa-chevron-right text-[10px] text-slate-500 group-hover:text-white"></i>
+        </div>
+      </div>
+      <div class="relative w-40 h-40">
+        <div class="absolute inset-0 bg-white/5 blur-2xl rounded-full scale-0 group-hover:scale-150 transition-transform duration-700"></div>
+        <img src="${h.aovIconUrl}" referrerpolicy="no-referrer" class="w-full h-full object-cover rounded-[2.5rem] relative z-10 shadow-2xl border border-white/5" />
+      </div>
+      <div class="text-center w-full">
+        <div class="text-2xl font-black text-white italic uppercase tracking-tighter group-hover:text-cyan-400 transition-colors mb-1 truncate px-2">${h.aovName}</div>
+        <div class="text-[9px] font-bold text-slate-500 uppercase tracking-widest flex items-center justify-center gap-2">
+          <span>VS</span>
+          <span class="text-rose-500">${h.hokName}</span>
+        </div>
+      </div>
+    </button>
+  `).join('');
+
+  // Click eventlerini tekrar bağla (Çünkü grid içeriği değişti)
+  grid.querySelectorAll('.hero-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const hero = HERO_MAPPINGS.find(m => m.aovName === (card as HTMLElement).dataset.aov);
+      if (hero) setState({ selectedHero: hero });
+    });
+  });
+
+  // Role tablarını güncelle (Aktif sınıfı için)
+  document.querySelectorAll('.role-tab').forEach(btn => {
+    const r = (btn as HTMLElement).dataset.role;
+    if (r === state.selectedRole) {
+      btn.classList.add('bg-cyan-600', 'text-white');
+      btn.classList.remove('glass', 'text-slate-500');
+    } else if (r === 'ALL' && state.selectedRole === 'ALL') {
+      btn.classList.add('bg-white', 'text-black');
+      btn.classList.remove('glass', 'text-slate-500');
+    } else {
+      btn.classList.remove('bg-cyan-600', 'text-white', 'bg-white', 'text-black');
+      btn.classList.add('glass', 'text-slate-500');
+    }
+  });
+}
+
+function render() {
+  const root = document.getElementById('root');
+  if (!root) return;
+
+  if (state.selectedHero) {
+    renderDetail(root, state.selectedHero);
+    isLayoutRendered = false;
+  } else {
+    if (!isLayoutRendered) {
+      renderListLayout(root);
+      isLayoutRendered = true;
+    }
+    updateDynamicContent();
+  }
+}
+
+function renderListLayout(container: HTMLElement) {
   const roles = Object.values(HeroRole);
 
   container.innerHTML = `
@@ -117,15 +185,13 @@ function renderList(container: HTMLElement) {
       </header>
 
       <div class="max-w-7xl mx-auto mb-16 space-y-12">
-        <!-- Role Tabs -->
-        <div class="flex flex-wrap justify-center gap-3">
-          <button class="role-tab px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${state.selectedRole === 'ALL' ? 'bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.3)]' : 'glass text-slate-500 hover:text-white'}" data-role="ALL">TÜMÜ</button>
+        <div class="flex flex-wrap justify-center gap-3" id="role-tabs-container">
+          <button class="role-tab px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all glass text-slate-500" data-role="ALL">TÜMÜ</button>
           ${roles.map(r => `
-            <button class="role-tab px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${state.selectedRole === r ? 'bg-cyan-600 text-white shadow-[0_0_30px_rgba(6,182,212,0.3)]' : 'glass text-slate-500 hover:text-white'}" data-role="${r}">${r}</button>
+            <button class="role-tab px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all glass text-slate-500" data-role="${r}">${r}</button>
           `).join('')}
         </div>
 
-        <!-- Search Bar -->
         <div class="max-w-2xl mx-auto relative group">
           <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-rose-500 rounded-[2.5rem] blur opacity-25 group-focus-within:opacity-50 transition-opacity"></div>
           <div class="relative glass rounded-[2.5rem] p-5 flex items-center">
@@ -135,47 +201,23 @@ function renderList(container: HTMLElement) {
         </div>
       </div>
 
-      <div class="hero-grid max-w-[1920px] mx-auto">
-        ${filtered.map((h, i) => `
-          <button class="hero-card hero-card-hover glass p-6 rounded-[3rem] h-[400px] flex flex-col items-center justify-between group animate-reveal" style="animation-delay: ${i * 0.05}s" data-aov="${h.aovName}">
-            <div class="w-full flex justify-between items-center">
-              ${getRoleBadge(h.role)}
-              <div class="w-8 h-8 rounded-full flex items-center justify-center border border-white/10 group-hover:bg-cyan-500/20 transition-colors">
-                <i class="fas fa-chevron-right text-[10px] text-slate-500 group-hover:text-white"></i>
-              </div>
-            </div>
-            
-            <div class="relative w-40 h-40">
-              <div class="absolute inset-0 bg-white/5 blur-2xl rounded-full scale-0 group-hover:scale-150 transition-transform duration-700"></div>
-              <img src="${h.aovIconUrl}" referrerpolicy="no-referrer" class="w-full h-full object-cover rounded-[2.5rem] relative z-10 shadow-2xl border border-white/5" />
-            </div>
-
-            <div class="text-center w-full">
-              <div class="text-2xl font-black text-white italic uppercase tracking-tighter group-hover:text-cyan-400 transition-colors mb-1 truncate px-2">${h.aovName}</div>
-              <div class="text-[9px] font-bold text-slate-500 uppercase tracking-widest flex items-center justify-center gap-2">
-                <span>VS</span>
-                <span class="text-rose-500">${h.hokName}</span>
-              </div>
-            </div>
-          </button>
-        `).join('')}
+      <div id="hero-grid-dynamic" class="hero-grid max-w-[1920px] mx-auto">
+        <!-- İçerik updateDynamicContent tarafından doldurulacak -->
       </div>
     </div>
   `;
 
-  // Listeners
-  document.getElementById('main-search')?.addEventListener('input', (e) => {
-    setState({ searchTerm: (e.target as HTMLInputElement).value });
+  // Global Eventler (Sadece Layout kurulduğunda bir kez bağlanır)
+  const searchInput = document.getElementById('main-search') as HTMLInputElement;
+  searchInput?.addEventListener('input', (e) => {
+    state.searchTerm = (e.target as HTMLInputElement).value;
+    updateDynamicContent();
   });
 
   document.querySelectorAll('.role-tab').forEach(btn => {
-    btn.addEventListener('click', () => setState({ selectedRole: (btn as HTMLElement).dataset.role as any }));
-  });
-
-  document.querySelectorAll('.hero-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const hero = HERO_MAPPINGS.find(m => m.aovName === (card as HTMLElement).dataset.aov);
-      if (hero) setState({ selectedHero: hero });
+    btn.addEventListener('click', () => {
+      state.selectedRole = (btn as HTMLElement).dataset.role as any;
+      updateDynamicContent();
     });
   });
 }
@@ -183,20 +225,15 @@ function renderList(container: HTMLElement) {
 function renderDetail(container: HTMLElement, hero: HeroMatch) {
   container.innerHTML = `
     <div class="min-h-screen flex items-center justify-center p-6 lg:p-12 relative overflow-hidden animate-reveal">
-      <!-- Back Button -->
       <button id="detail-back" class="fixed top-8 left-8 z-50 glass px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all group">
         <i class="fas fa-arrow-left mr-3 group-hover:-translate-x-1 transition-transform"></i> Listeye Dön
       </button>
 
       <div class="max-w-[1400px] w-full relative z-10">
         <div class="flex flex-col lg:flex-row items-center justify-center gap-16 lg:gap-24">
-          
-          <!-- AoV side -->
           <div class="flex-1 animate-reveal" style="animation-delay: 0.1s">
             ${HeroDetailDisplay(hero.aovName, true, hero.aovIconUrl)}
           </div>
-
-          <!-- Middle Stats -->
           <div class="flex flex-col items-center gap-12 w-80 animate-reveal" style="animation-delay: 0.2s">
             <div class="relative">
               <div class="w-32 h-32 rounded-full border-2 border-white/10 flex items-center justify-center bg-slate-950/80 backdrop-blur-2xl relative z-10">
@@ -204,13 +241,11 @@ function renderDetail(container: HTMLElement, hero: HeroMatch) {
               </div>
               <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-rose-500 rounded-full blur-3xl opacity-20 animate-pulse"></div>
             </div>
-
             <div class="w-full space-y-6">
               <div class="text-center">
                 <div class="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mb-2">Eşleşme Oranı</div>
                 <div class="text-7xl font-black text-white italic tracking-tighter">%${hero.matchSimilarity}</div>
               </div>
-              
               <div class="grid grid-cols-1 gap-4">
                 <div class="glass p-5 rounded-3xl border-white/5 text-center">
                   <div class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Pozisyon</div>
@@ -222,19 +257,15 @@ function renderDetail(container: HTMLElement, hero: HeroMatch) {
                 </div>
               </div>
             </div>
-
             <div class="glass p-6 rounded-3xl border-white/5 w-full text-center">
               <p class="text-xs text-slate-400 italic leading-relaxed font-medium uppercase tracking-wider">
                 "${hero.description}"
               </p>
             </div>
           </div>
-
-          <!-- HoK side -->
           <div class="flex-1 animate-reveal" style="animation-delay: 0.3s">
             ${HeroDetailDisplay(hero.hokName, false, hero.hokIconUrl)}
           </div>
-
         </div>
       </div>
     </div>
@@ -245,5 +276,4 @@ function renderDetail(container: HTMLElement, hero: HeroMatch) {
   });
 }
 
-// Initial Render
 render();
