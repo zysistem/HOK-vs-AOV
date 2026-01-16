@@ -32,7 +32,6 @@ const getRoleBadgeColor = (role: HeroRole) => {
   }
 };
 
-// Hero Kartı Şablonu
 function HeroCardHTML(hero: string, isAoV: boolean, role: HeroRole, iconUrl?: string) {
   const fallbackUrl = `https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${hero}&backgroundColor=${isAoV ? '0ea5e9' : 'ef4444'}`;
   const displayImage = iconUrl || fallbackUrl;
@@ -73,19 +72,13 @@ function HeroCardHTML(hero: string, isAoV: boolean, role: HeroRole, iconUrl?: st
   `;
 }
 
-// Ana Render Fonksiyonu
 function render() {
   const root = document.getElementById('root');
   if (!root) return;
-
-  if (state.selectedHero) {
-    renderDetailView(root, state.selectedHero);
-  } else {
-    renderListView(root);
-  }
+  if (state.selectedHero) { renderDetailView(root, state.selectedHero); } 
+  else { renderListView(root); }
 }
 
-// Liste Görünümü
 function renderListView(container: HTMLElement) {
   const filtered = HERO_MAPPINGS.filter(h => {
     const search = state.searchTerm.toLowerCase();
@@ -112,10 +105,9 @@ function renderListView(container: HTMLElement) {
             </span>
             <span class="text-[10px] font-black tracking-[0.4em] text-slate-400 uppercase">ZY MOBA - Cross Reference</span>
           </div>
-          <h1 class="heading-font text-6xl md:text-9xl font-black tracking-tighter mb-8 text-white uppercase italic">
+          <h1 class="heading-font text-5xl md:text-8xl font-black tracking-tighter mb-8 text-white uppercase italic">
             ZY <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-white to-rose-400">MOBA</span>
           </h1>
-          <p class="text-slate-500 text-sm md:text-lg font-bold tracking-[0.2em] uppercase mb-4 opacity-60">Kahraman Karşılaştırıcı (AoV & HoK)</p>
         </header>
 
         <div class="max-w-5xl mx-auto mb-24 space-y-10">
@@ -162,11 +154,10 @@ function renderListView(container: HTMLElement) {
     </div>
   `;
 
-  // Listeners
+  // Attach Listeners
   document.querySelectorAll('.role-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const role = (e.currentTarget as HTMLElement).dataset.role as HeroRole | 'ALL';
-      setState({ selectedRole: role });
+      setState({ selectedRole: (e.currentTarget as HTMLElement).dataset.role as any });
     });
   });
 
@@ -174,21 +165,17 @@ function renderListView(container: HTMLElement) {
   if (searchInput) {
     searchInput.focus();
     searchInput.setSelectionRange(state.searchTerm.length, state.searchTerm.length);
-    searchInput.addEventListener('input', (e) => {
-      setState({ searchTerm: (e.target as HTMLInputElement).value });
-    });
+    searchInput.addEventListener('input', (e) => setState({ searchTerm: (e.target as HTMLInputElement).value }));
   }
 
   document.querySelectorAll('.hero-select-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const heroName = (e.currentTarget as HTMLElement).dataset.hero;
-      const hero = HERO_MAPPINGS.find(h => h.aovName === heroName);
+      const hero = HERO_MAPPINGS.find(h => h.aovName === (e.currentTarget as HTMLElement).dataset.hero);
       if (hero) setState({ selectedHero: hero });
     });
   });
 }
 
-// Detay Görünümü
 function renderDetailView(container: HTMLElement, hero: HeroMatch) {
   container.innerHTML = `
     <div class="min-h-screen bg-[#020617] text-slate-200 font-['Inter'] pb-20 relative">
@@ -199,8 +186,6 @@ function renderDetailView(container: HTMLElement, hero: HeroMatch) {
 
       <div class="relative z-10 max-w-[1600px] mx-auto px-6 py-24">
         <div class="flex flex-col lg:flex-row items-center justify-center gap-16 lg:gap-24">
-          
-          <!-- AoV Hero -->
           <div class="w-full lg:flex-1 max-w-md space-y-8">
             <div class="bg-slate-900/60 border border-sky-500/30 p-8 rounded-[2.5rem] backdrop-blur-3xl text-center shadow-2xl">
                <div class="text-[10px] font-black text-sky-500 uppercase tracking-widest mb-2">ARENA OF VALOR</div>
@@ -209,7 +194,6 @@ function renderDetailView(container: HTMLElement, hero: HeroMatch) {
             ${HeroCardHTML(hero.aovName, true, hero.role, hero.aovIconUrl)}
           </div>
           
-          <!-- Middle VS Section -->
           <div class="flex flex-col items-center gap-12">
              <div class="relative">
                 <div class="w-28 h-28 rounded-full bg-slate-950 border-4 border-slate-800 flex items-center justify-center relative z-10 shadow-2xl">
@@ -244,7 +228,6 @@ function renderDetailView(container: HTMLElement, hero: HeroMatch) {
              </button>
           </div>
 
-          <!-- HoK Hero -->
           <div class="w-full lg:flex-1 max-w-md space-y-8">
             <div class="bg-slate-900/60 border border-rose-500/30 p-8 rounded-[2.5rem] backdrop-blur-3xl text-center shadow-2xl">
                <div class="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2">HONOR OF KINGS</div>
@@ -257,10 +240,7 @@ function renderDetailView(container: HTMLElement, hero: HeroMatch) {
     </div>
   `;
 
-  document.getElementById('back-btn')?.addEventListener('click', () => {
-    setState({ selectedHero: null });
-  });
+  document.getElementById('back-btn')?.addEventListener('click', () => setState({ selectedHero: null }));
 }
 
-// Initial Run
 render();
